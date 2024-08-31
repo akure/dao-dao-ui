@@ -44,6 +44,8 @@ telescope({
           'cosmos.base.query.v1beta1',
           'cosmos.base.tendermint.v1beta1',
           'cosmos.crypto.ed25519',
+          'cosmos.crypto.multisig',
+          'cosmos.crypto.secp256k1',
           'cosmos.distribution.v1beta1',
           'cosmos.gov.v1',
           'cosmos.gov.v1beta1',
@@ -101,6 +103,8 @@ telescope({
           'regen.ecocredit.v1',
           'regen.ecocredit.v1alpha1',
           'regen.intertx.v1',
+          'alliance.alliance',
+          'circle.cctp.v1',
         ],
       },
       // excluded: {

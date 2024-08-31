@@ -18,24 +18,7 @@ const config = {
       'zh-tw',
     ],
     defaultLocale: 'en',
-    domains: [
-      {
-        domain: 'daodao.zone',
-        defaultLocale: 'en',
-      },
-      {
-        domain: 'dao.daodao.zone',
-        defaultLocale: 'en',
-      },
-      {
-        domain: 'badbad.zone',
-        defaultLocale: 'bad',
-      },
-      {
-        domain: 'bad.badbad.zone',
-        defaultLocale: 'bad',
-      },
-    ],
+    localeDetection: false,
   },
   lowerCaseLng: true,
   localePath: path.resolve(__dirname, '../../packages/i18n/locales'),

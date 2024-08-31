@@ -95,6 +95,11 @@ export const cosmosValidatorToValidator = ({
 })
 
 export const getImageUrlForChainId = (chainId: string): string => {
+  const overrideUrl = getConfiguredChainConfig(chainId)?.overrideChainImageUrl
+  if (overrideUrl) {
+    return overrideUrl
+  }
+
   //Chain logo is sometimes larger and not square.
   const { logo_URIs, images } = maybeGetChainForChainId(chainId) ?? {}
   const chainImageUrl =
@@ -494,6 +499,14 @@ export const getSupportedChains = ({
     chain: getChainForChainId(config.chainId),
     ...config,
   }))
+
+/**
+ * Whether or not we index this chain.
+ */
+export const chainIsIndexed = (chainId: string): boolean =>
+  SUPPORTED_CHAINS.some(
+    (config) => config.chainId === chainId && !config.noIndexer
+  )
 
 // Validates whether the address is for the current chain. If so, return
 // undefined. If not, return the correct subdomain.

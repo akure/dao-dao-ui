@@ -20,9 +20,6 @@ export const SUPPORTED_CHAINS: SupportedChainConfig[] = [
     kado: {
       network: 'JUNO',
     },
-    indexes: {
-      search: 'daos',
-    },
     explorerUrlTemplates: {
       tx: 'https://ping.pub/juno/tx/REPLACE',
       gov: 'https://ping.pub/juno/gov',
@@ -181,9 +178,6 @@ export const SUPPORTED_CHAINS: SupportedChainConfig[] = [
       'osmo102pg8quxtvhye3k4rcqwh7j5zwf5ekhcvlquafjjxjnarhu38qzstkdm6p',
     kado: {
       network: 'OSMOSIS',
-    },
-    indexes: {
-      search: 'osmosis_daos',
     },
     explorerUrlTemplates: {
       tx: 'https://ping.pub/osmosis/tx/REPLACE',
@@ -350,6 +344,24 @@ export const SUPPORTED_CHAINS: SupportedChainConfig[] = [
         // kujira
         remoteChannel: 'channel-146',
       },
+      [ChainId.OraichainMainnet]: {
+        // osmosis
+        note: 'osmo1heyensqmjxare0u3vms5q52czw4j6lwfszyhsfyjmqw54j6n2tnq9l0yh4',
+        // osmosis
+        listener:
+          'osmo128t3k4gfenvxegdjft9r8ctely99drl4hgcvdrgcmlfhlla6ftuqydl0w4',
+        // oraichain
+        voice:
+          'orai16wexpcgt9wn88yuu8mdln7lx2l85ygj594jxm9aufjn6qwny49vs6mvcq4',
+        // osmosis
+        localConnection: 'connection-1464',
+        // oraichain
+        remoteConnection: 'connection-21',
+        // osmosis
+        localChannel: 'channel-20861',
+        // oraichain
+        remoteChannel: 'channel-214',
+      },
     },
   },
   {
@@ -359,9 +371,6 @@ export const SUPPORTED_CHAINS: SupportedChainConfig[] = [
     accentColor: '#000000',
     factoryContractAddress:
       'neutron1xms03jykg6e2g402dxj3cw4q6ygm0r5rctdt5d7j99xehwtevm3sxl52n5',
-    indexes: {
-      search: 'neutron_daos',
-    },
     explorerUrlTemplates: {
       tx: 'https://ping.pub/neutron/tx/REPLACE',
       gov: 'https://ping.pub/neutron/gov',
@@ -495,9 +504,6 @@ export const SUPPORTED_CHAINS: SupportedChainConfig[] = [
     accentColor: '#8ac3cc',
     factoryContractAddress:
       'stars175zvu8psmyxlszsxaa5thz26gjm4y6l24cr9ctgs09g90755tpmqmskl4t',
-    indexes: {
-      search: 'stargaze_daos',
-    },
     explorerUrlTemplates: {
       tx: 'https://ping.pub/stargaze/tx/REPLACE',
       gov: 'https://ping.pub/stargaze/gov',
@@ -639,6 +645,24 @@ export const SUPPORTED_CHAINS: SupportedChainConfig[] = [
         // kujira
         remoteChannel: 'channel-135',
       },
+      [ChainId.TerraMainnet]: {
+        // stargaze
+        note: 'stars1c8xqrx3es7nlzfx94hpsx94tu9mlxpdqv3338m039z0v4zltsl7qg7aglq',
+        // stargaze
+        listener:
+          'stars1qd4hzjx8ugvkt5mtds9hxdm4c7hanfakgt80zrszyr9ccannq9zqg0t9tw',
+        // terra
+        voice:
+          'terra1xezqw7jhu87ux2g7f2d27hlwt4u3qa8726j833323rrum82jgesq8ux30x',
+        // stargaze
+        localConnection: 'connection-275',
+        // terra
+        remoteConnection: 'connection-408',
+        // stargaze
+        localChannel: 'channel-284',
+        // terra
+        remoteChannel: 'channel-383',
+      },
     },
   },
   {
@@ -648,9 +672,6 @@ export const SUPPORTED_CHAINS: SupportedChainConfig[] = [
     accentColor: '#3ccd64',
     factoryContractAddress:
       'migaloo19q77nmuaq3mnwecnxu7cfj6y6nd4jzw9x20v6xm66lmhqlvxwrkscaefz8',
-    indexes: {
-      search: 'migaloo_daos',
-    },
     explorerUrlTemplates: {
       tx: 'https://inbloc.org/migaloo/transactions/REPLACE',
       gov: 'https://inbloc.org/migaloo/governance',
@@ -774,6 +795,224 @@ export const SUPPORTED_CHAINS: SupportedChainConfig[] = [
         // terra
         // remoteClient: '07-tendermint-105',
       },
+      [ChainId.ChihuahuaMainnet]: {
+        // migaloo
+        note: 'migaloo1ezyangwcudgx7vq664g8zqtnrtl6nsvup9yfulewynlx2dru99ls54hxdn',
+        // migaloo
+        listener:
+          'migaloo1jm58dy8ymmnffdgm3t8clye56qhdmw7g7jgsnarcnzk66jzdcyvqjxj0gn',
+        // chihuahua
+        voice:
+          'chihuahua1ppjcxp24dw0s6nx94hsnlutxmsqqvds66u968w29x8xuwmw0gntqkcvtq0',
+        // migaloo
+        localConnection: 'connection-21',
+        // chihuahua
+        remoteConnection: 'connection-81',
+        // migaloo
+        localChannel: 'channel-111',
+        // chihuahua
+        remoteChannel: 'channel-80',
+        // migaloo
+        // localClient: '07-tendermint-21',
+        // chihuahua
+        // remoteClient: '07-tendermint-126',
+      },
+    },
+  },
+  {
+    chainId: ChainId.TerraMainnet,
+    name: 'terra',
+    mainnet: true,
+    overrideChainImageUrl: '/chains/terra.png',
+    accentColor: '#113da5',
+    factoryContractAddress:
+      'terra1a6m80fzww958qljatddgdj4xpj29effyshkh6rek8thmfzprd3ssw6wz2f',
+    explorerUrlTemplates: {
+      tx: 'https://finder.terra.money/mainnet/tx/REPLACE',
+      gov: 'https://ping.pub/terra/gov',
+      govProp: 'https://ping.pub/terra/gov/REPLACE',
+      wallet: 'https://finder.terra.money/mainnet/address/REPLACE',
+    },
+    codeIds: {
+      // https://github.com/CosmWasm/cw-plus
+      Cw1Whitelist: 2627,
+      Cw4Group: 2628, // v0.16
+      // https://github.com/CosmWasm/cw-nfts
+      Cw721Base: 2629,
+
+      // ContractVersion.V240
+      CwPayrollFactory: 2631,
+      CwTokenSwap: 2632,
+      CwTokenfactoryIssuer: 2633,
+      CwVesting: 2634,
+      DaoCore: 2635,
+      DaoMigrator: -1,
+      DaoPreProposeApprovalSingle: 2637,
+      DaoPreProposeApprover: 2638,
+      DaoPreProposeMultiple: 2639,
+      DaoPreProposeSingle: 2640,
+      DaoProposalMultiple: 2641,
+      DaoProposalSingle: 2642,
+      DaoVotingCw4: 2643,
+      DaoVotingCw721Staked: 2644,
+      DaoVotingTokenStaked: 2645,
+    },
+    polytone: {
+      [ChainId.JunoMainnet]: {
+        // terra
+        note: 'terra1dfwrwcjmsnprmr9938sg3d2885vm84cg2jfxtznf7kr59nrrxdtsdgnqu8',
+        // terra
+        listener:
+          'terra1eqk2urjf0yvtpeaqu0r9zhkzptau9ulmwypjt6f3e7ktwtha48gsu3x2ee',
+        // juno
+        voice:
+          'juno1ct0klhzska7h2k74m0pjlyr0u20mm8d3h4antq5fqeqfvavhc2gqcgw847',
+        // terra
+        localConnection: 'connection-6',
+        // juno
+        remoteConnection: 'connection-128',
+        // terra
+        localChannel: 'channel-385',
+        // juno
+        remoteChannel: 'channel-520',
+      },
+      [ChainId.OsmosisMainnet]: {
+        // terra
+        note: 'terra13wdx8mgcj73ltfgfq2mazwrryxadzcmwy0l2xmllpgs03hq0q8lqqyy2kn',
+        // terra
+        listener:
+          'terra1hudgkhufhp7a20jnk8vvc2x6l8f55tpx7tr8wkqq996zjv9v3yqqcpyaar',
+        // osmosis
+        voice:
+          'osmo1j3dzaqvaqa6navmz89rdmjrnztvgh5xma25wxchv6f3aj48jg6uqmxkhfu',
+        // terra
+        localConnection: 'connection-3',
+        // osmosis
+        remoteConnection: 'connection-1536',
+        // terra
+        localChannel: 'channel-386',
+        // osmosis
+        remoteChannel: 'channel-21185',
+      },
+      [ChainId.StargazeMainnet]: {
+        // terra
+        note: 'terra1ts8j0cwnykrh39nc97mxmzesvnukyru3uua3hych0s345a0wz32qhklzfw',
+        // terra
+        listener:
+          'terra1z4qyl5t3wtv7006chg3ar8hpyzuqsuyj5uqujhskplwtun28ucss23uap7',
+        // stargaze
+        voice:
+          'stars1457shfac8965ju277wwukf4qfvf24uqzrjdmw8j5w0xwhp8zps0qal9ure',
+        // terra
+        localConnection: 'connection-408',
+        // stargaze
+        remoteConnection: 'connection-275',
+        // terra
+        localChannel: 'channel-387',
+        // stargaze
+        remoteChannel: 'channel-285',
+      },
+      [ChainId.NeutronMainnet]: {
+        // terra
+        note: 'terra1eumwktcszm8p5p3apuxq4mrk008rx8sakntq68a5x6l6my33jl2qfvsfge',
+        // terra
+        listener:
+          'terra1hu8esz9yhfrhj2eyq70refpmmdem95my2rpc2d896nt2a3p34s0qf5chle',
+        // neutron
+        voice:
+          'neutron1dsxy6h7cfnrguqe09ym599wk09a9zpyzw6r6yttrkquqffp06l6sfptpfp',
+        // terra
+        localConnection: 'connection-192',
+        // neutron
+        remoteConnection: 'connection-9',
+        // terra
+        localChannel: 'channel-388',
+        // neutron
+        remoteChannel: 'channel-994',
+      },
+      [ChainId.MigalooMainnet]: {
+        // terra
+        note: 'terra1pmdg4yq0ew57fdpwckcsey5jw60tth49cm2vpw0r5l6zj368xvhshjurcl',
+        // terra
+        listener:
+          'terra1xftzcyz2s2t0d35985j0w0csqffzczxfm5k3gw6dgd34etw88sxqz6t03k',
+        // migaloo
+        voice:
+          'migaloo1ruw9ptkcdrj80npzuhzkryr5uxdf0nxw8w77eytwkvcmuh7al7gs0yaqpe',
+        // terra
+        localConnection: 'connection-93',
+        // migaloo
+        remoteConnection: 'connection-0',
+        // terra
+        localChannel: 'channel-389',
+        // migaloo
+        remoteChannel: 'channel-112',
+      },
+    },
+  },
+  {
+    chainId: ChainId.OraichainMainnet,
+    name: 'oraichain',
+    mainnet: true,
+    overrideChainImageUrl: '/chains/oraichain.svg',
+    accentColor: '#ffffff',
+    factoryContractAddress:
+      'orai1jwuyup67xem5tecj2pt098y23h5032f66zvj709p7mgz4vgyjx3qua5r5g',
+    createWithCw20: true,
+    explorerUrlTemplates: {
+      tx: 'https://scan.orai.io/txs/REPLACE',
+      gov: 'https://scan.orai.io/proposals',
+      govProp: 'https://scan.orai.io/proposals/REPLACE',
+      wallet: 'https://scan.orai.io/account/REPLACE',
+    },
+    codeIds: {
+      // https://github.com/CosmWasm/cw-plus
+      Cw1Whitelist: 1546,
+      Cw4Group: 1547, // v0.16
+      // https://github.com/CosmWasm/cw-nfts
+      Cw721Base: 1548,
+
+      // ContractVersion.V240
+      CwPayrollFactory: 1550,
+      CwTokenSwap: 1551,
+      CwTokenfactoryIssuer: 1552,
+      CwVesting: 1553,
+      DaoCore: 1554,
+      DaoMigrator: -1,
+      DaoPreProposeApprovalSingle: 1556,
+      DaoPreProposeApprover: 1557,
+      DaoPreProposeMultiple: 1558,
+      DaoPreProposeSingle: 1559,
+      DaoProposalMultiple: 1560,
+      DaoProposalSingle: 1561,
+      DaoVotingCw4: 1562,
+      DaoVotingCw721Staked: 1563,
+      DaoVotingTokenStaked: 1564,
+
+      // Oraichain uses cw20 DAOs.
+      Cw20Base: 1595, // v1.1.2
+      Cw20Stake: 1565,
+      DaoVotingCw20Staked: 1566,
+    },
+    polytone: {
+      [ChainId.OsmosisMainnet]: {
+        // oraichain
+        note: 'orai1hvfzt6f7n7pea803j633089rsh23qhgmexk3j844lsegnyfxjluqt0e9pq',
+        // oraichain
+        listener:
+          'orai1efwyc0zlc69n7pvj6yvnem504ynsv4xprquk9rgd65dthhc8n08snhh5my',
+        // osmosis
+        voice:
+          'osmo1e459dlf6y4xlmlsjfpzpea6p54fx5zkngq203p4eamjhn334h56sspgqhz',
+        // oraichain
+        localConnection: 'connection-21',
+        // osmosis
+        remoteConnection: 'connection-1464',
+        // oraichain
+        localChannel: 'channel-216',
+        // osmosis
+        remoteChannel: 'channel-20862',
+      },
     },
   },
   {
@@ -783,9 +1022,6 @@ export const SUPPORTED_CHAINS: SupportedChainConfig[] = [
     accentColor: '#f74a49',
     factoryContractAddress:
       'juno1dacj3j6pwr7jx0jeu99qdc4a2ylc2rxp4v3zap54sfrl3ntrhe8qkjfpku',
-    indexes: {
-      search: 'testnet_daos',
-    },
     explorerUrlTemplates: {
       tx: 'https://testnet.ping.pub/juno/tx/REPLACE',
       gov: 'https://testnet.ping.pub/juno/gov',
@@ -834,9 +1070,6 @@ export const SUPPORTED_CHAINS: SupportedChainConfig[] = [
     accentColor: '#5604e8',
     factoryContractAddress:
       'osmo1v5k3527dt2vt67848h8jk0az9dyl8sunsqaapznf2j9tm4arxxfs7gwa0n',
-    indexes: {
-      search: 'osmosis_testnet_daos',
-    },
     explorerUrlTemplates: {
       tx: 'https://testnet.ping.pub/osmosis/tx/REPLACE',
       gov: 'https://testnet.ping.pub/osmosis/gov',
@@ -881,9 +1114,6 @@ export const SUPPORTED_CHAINS: SupportedChainConfig[] = [
     accentColor: '#8ac3cc',
     factoryContractAddress:
       'stars1ajrde5kky0c3xspjthqncxd72qmyu5trfsspn6ndk892gyqwakzsdjmegx',
-    indexes: {
-      search: 'stargaze_testnet_daos',
-    },
     explorerUrlTemplates: {
       tx: 'https://testnet.ping.pub/stargaze/tx/REPLACE',
       gov: 'https://testnet.ping.pub/stargaze/gov',
@@ -926,9 +1156,6 @@ export const SUPPORTED_CHAINS: SupportedChainConfig[] = [
     accentColor: '#3ccd64',
     factoryContractAddress:
       'migaloo1wug8sewp6cedgkmrmvhl3lf3tulagm9hnvy8p0rppz9yjw0g4wtqvk723g',
-    indexes: {
-      search: 'migaloo_testnet_daos',
-    },
     explorerUrlTemplates: {
       tx: 'https://testnet.ping.pub/migaloo/tx/REPLACE',
       gov: 'https://testnet.ping.pub/migaloo/gov',
@@ -1002,8 +1229,8 @@ export const CHAIN_ENDPOINTS: Partial<
     rest: 'https://rest.elgafar-1.stargaze-apis.com',
   },
   [ChainId.NeutronMainnet]: {
-    rpc: 'https://rpc-kralum.neutron-1.neutron.org',
-    rest: 'https://rest-kralum.neutron-1.neutron.org',
+    rpc: 'https://rpc-lb.neutron.org',
+    rest: 'https://rest-lb.neutron.org',
   },
   [ChainId.CosmosHubMainnet]: {
     rpc: 'https://cosmos-rpc.polkachu.com',
@@ -1024,6 +1251,14 @@ export const CHAIN_ENDPOINTS: Partial<
   [ChainId.KujiraMainnet]: {
     rpc: 'https://kujira-rpc.polkachu.com',
     rest: 'https://kujira-api.polkachu.com',
+  },
+  [ChainId.ChihuahuaMainnet]: {
+    rpc: 'https://chihuahua-rpc.polkachu.com',
+    rest: 'https://chihuahua-api.polkachu.com',
+  },
+  [ChainId.OraichainMainnet]: {
+    rpc: 'https://rpc.orai.io',
+    rest: 'https://lcd.orai.io',
   },
 }
 

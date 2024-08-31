@@ -27,8 +27,38 @@ index c04740c22..98853e53d 100644
      } else {
        obj.msgs = [];
      }
+diff --git b/packages/utils/protobuf/codegen/cosmos/bank/v1beta1/bank.ts a/packages/utils/protobuf/codegen/cosmos/bank/v1beta1/bank.ts
+index 9eb780900..70b01f2fc 100644
+--- b/packages/utils/protobuf/codegen/cosmos/bank/v1beta1/bank.ts
++++ a/packages/utils/protobuf/codegen/cosmos/bank/v1beta1/bank.ts
+@@ -930,7 +930,9 @@ export const Metadata = {
+   },
+   toAmino(message: Metadata, useInterfaces: boolean = false): MetadataAmino {
+     const obj: any = {};
+-    obj.description = message.description;
++    if (message.description) {
++      obj.description = message.description;
++    }
+     if (message.denomUnits) {
+       obj.denom_units = message.denomUnits.map(e => e ? DenomUnit.toAmino(e, useInterfaces) : undefined);
+     } else {
+@@ -940,8 +942,12 @@ export const Metadata = {
+     obj.display = message.display;
+     obj.name = message.name;
+     obj.symbol = message.symbol;
+-    obj.uri = message.uri;
+-    obj.uri_hash = message.uriHash;
++    if (message.uri) {
++      obj.uri = message.uri;
++    }
++    if (message.uriHash) {
++      obj.uri_hash = message.uriHash;
++    }
+     return obj;
+   },
+   fromAminoMsg(object: MetadataAminoMsg): Metadata {
 diff --git b/packages/utils/protobuf/codegen/cosmos/gov/v1/tx.ts a/packages/utils/protobuf/codegen/cosmos/gov/v1/tx.ts
-index 77d8f28c8..a50ee67e9 100644
+index 6c5cc594d..99099f81a 100644
 --- b/packages/utils/protobuf/codegen/cosmos/gov/v1/tx.ts
 +++ a/packages/utils/protobuf/codegen/cosmos/gov/v1/tx.ts
 @@ -1,7 +1,7 @@
@@ -38,9 +68,9 @@ index 77d8f28c8..a50ee67e9 100644
 -import { VoteOption, WeightedVoteOption, WeightedVoteOptionAmino, WeightedVoteOptionSDKType, Params, ParamsAmino, ParamsSDKType, voteOptionFromJSON } from "./gov";
 +import { VoteOption, WeightedVoteOption, WeightedVoteOptionAmino, WeightedVoteOptionSDKType, Params, ParamsAmino, ParamsSDKType } from "./gov";
  import { Timestamp } from "../../../google/protobuf/timestamp";
+ import { MsgCreateAllianceProposal, MsgCreateAllianceProposalProtoMsg, MsgCreateAllianceProposalSDKType, MsgUpdateAllianceProposal, MsgUpdateAllianceProposalProtoMsg, MsgUpdateAllianceProposalSDKType, MsgDeleteAllianceProposal, MsgDeleteAllianceProposalProtoMsg, MsgDeleteAllianceProposalSDKType } from "../../../alliance/alliance/gov";
  import { CommunityPoolSpendProposal, CommunityPoolSpendProposalProtoMsg, CommunityPoolSpendProposalSDKType, CommunityPoolSpendProposalWithDeposit, CommunityPoolSpendProposalWithDepositProtoMsg, CommunityPoolSpendProposalWithDepositSDKType } from "../../distribution/v1beta1/distribution";
- import { TextProposal, TextProposalProtoMsg, TextProposalSDKType } from "../v1beta1/gov";
-@@ -21,6 +21,7 @@ import { AllowDenomProposal, AllowDenomProposalProtoMsg, AllowDenomProposalSDKTy
+@@ -22,6 +22,7 @@ import { AllowDenomProposal, AllowDenomProposalProtoMsg, AllowDenomProposalSDKTy
  import { CreditTypeProposal, CreditTypeProposalProtoMsg, CreditTypeProposalSDKType } from "../../../regen/ecocredit/v1/types";
  import { BinaryReader, BinaryWriter } from "../../../binary";
  import { toTimestamp, fromTimestamp } from "../../../helpers";
@@ -48,7 +78,7 @@ index 77d8f28c8..a50ee67e9 100644
  /**
   * MsgSubmitProposal defines an sdk.Msg type that supports submitting arbitrary
   * proposal Content.
-@@ -576,7 +577,7 @@ export const MsgSubmitProposal = {
+@@ -577,7 +578,7 @@ export const MsgSubmitProposal = {
    },
    fromAmino(object: MsgSubmitProposalAmino): MsgSubmitProposal {
      const message = createBaseMsgSubmitProposal();
@@ -57,7 +87,7 @@ index 77d8f28c8..a50ee67e9 100644
      message.initialDeposit = object.initial_deposit?.map(e => Coin.fromAmino(e)) || [];
      if (object.proposer !== undefined && object.proposer !== null) {
        message.proposer = object.proposer;
-@@ -597,10 +598,8 @@ export const MsgSubmitProposal = {
+@@ -598,10 +599,8 @@ export const MsgSubmitProposal = {
    },
    toAmino(message: MsgSubmitProposal, useInterfaces: boolean = false): MsgSubmitProposalAmino {
      const obj: any = {};
@@ -70,7 +100,7 @@ index 77d8f28c8..a50ee67e9 100644
      }
      if (message.initialDeposit) {
        obj.initial_deposit = message.initialDeposit.map(e => e ? Coin.toAmino(e, useInterfaces) : undefined);
-@@ -611,7 +610,9 @@ export const MsgSubmitProposal = {
+@@ -612,7 +611,9 @@ export const MsgSubmitProposal = {
      obj.metadata = message.metadata;
      obj.title = message.title;
      obj.summary = message.summary;
@@ -81,7 +111,7 @@ index 77d8f28c8..a50ee67e9 100644
      return obj;
    },
    fromAminoMsg(object: MsgSubmitProposalAminoMsg): MsgSubmitProposal {
-@@ -910,7 +911,7 @@ export const MsgVote = {
+@@ -911,7 +912,7 @@ export const MsgVote = {
        message.voter = object.voter;
      }
      if (object.option !== undefined && object.option !== null) {
@@ -91,7 +121,7 @@ index 77d8f28c8..a50ee67e9 100644
      if (object.metadata !== undefined && object.metadata !== null) {
        message.metadata = object.metadata;
 diff --git b/packages/utils/protobuf/codegen/cosmos/gov/v1beta1/tx.ts a/packages/utils/protobuf/codegen/cosmos/gov/v1beta1/tx.ts
-index 27a0730a2..2989a1f86 100644
+index 0a7aa8cc5..2451cbfd8 100644
 --- b/packages/utils/protobuf/codegen/cosmos/gov/v1beta1/tx.ts
 +++ a/packages/utils/protobuf/codegen/cosmos/gov/v1beta1/tx.ts
 @@ -1,7 +1,7 @@
@@ -100,10 +130,10 @@ index 27a0730a2..2989a1f86 100644
  import { Coin, CoinAmino, CoinSDKType } from "../../base/v1beta1/coin";
 -import { VoteOption, WeightedVoteOption, WeightedVoteOptionAmino, WeightedVoteOptionSDKType, TextProposal, TextProposalProtoMsg, TextProposalSDKType, voteOptionFromJSON } from "./gov";
 +import { VoteOption, WeightedVoteOption, WeightedVoteOptionAmino, WeightedVoteOptionSDKType, TextProposal, TextProposalProtoMsg, TextProposalSDKType } from "./gov";
+ import { MsgCreateAllianceProposal, MsgCreateAllianceProposalProtoMsg, MsgCreateAllianceProposalSDKType, MsgUpdateAllianceProposal, MsgUpdateAllianceProposalProtoMsg, MsgUpdateAllianceProposalSDKType, MsgDeleteAllianceProposal, MsgDeleteAllianceProposalProtoMsg, MsgDeleteAllianceProposalSDKType } from "../../../alliance/alliance/gov";
  import { CommunityPoolSpendProposal, CommunityPoolSpendProposalProtoMsg, CommunityPoolSpendProposalSDKType, CommunityPoolSpendProposalWithDeposit, CommunityPoolSpendProposalWithDepositProtoMsg, CommunityPoolSpendProposalWithDepositSDKType } from "../../distribution/v1beta1/distribution";
  import { ParameterChangeProposal, ParameterChangeProposalProtoMsg, ParameterChangeProposalSDKType } from "../../params/v1beta1/params";
- import { SoftwareUpgradeProposal, SoftwareUpgradeProposalProtoMsg, SoftwareUpgradeProposalSDKType, CancelSoftwareUpgradeProposal, CancelSoftwareUpgradeProposalProtoMsg, CancelSoftwareUpgradeProposalSDKType } from "../../upgrade/v1beta1/upgrade";
-@@ -470,7 +470,7 @@ export const MsgVote = {
+@@ -471,7 +471,7 @@ export const MsgVote = {
        message.voter = object.voter;
      }
      if (object.option !== undefined && object.option !== null) {
@@ -127,3 +157,56 @@ index 11d5dba92..e5ef23ea1 100644
      return obj;
    },
    fromAminoMsg(object: MsgInstantiateContract2AminoMsg): MsgInstantiateContract2 {
+diff --git b/packages/utils/protobuf/codegen/neutron/client.ts a/packages/utils/protobuf/codegen/neutron/client.ts
+index 1caf8781d..9d864d753 100644
+--- b/packages/utils/protobuf/codegen/neutron/client.ts
++++ a/packages/utils/protobuf/codegen/neutron/client.ts
+@@ -7,21 +7,24 @@ import * as neutronFeeburnerTxRegistry from "./feeburner/tx.registry";
+ import * as neutronFeerefunderTxRegistry from "./feerefunder/tx.registry";
+ import * as neutronInterchainqueriesTxRegistry from "./interchainqueries/tx.registry";
+ import * as neutronInterchaintxsV1TxRegistry from "./interchaintxs/v1/tx.registry";
++import * as neutronTransferV1TxRegistry from "./transfer/v1/tx.registry";
+ import * as neutronCronTxAmino from "./cron/tx.amino";
+ import * as neutronDexTxAmino from "./dex/tx.amino";
+ import * as neutronFeeburnerTxAmino from "./feeburner/tx.amino";
+ import * as neutronFeerefunderTxAmino from "./feerefunder/tx.amino";
+ import * as neutronInterchainqueriesTxAmino from "./interchainqueries/tx.amino";
+ import * as neutronInterchaintxsV1TxAmino from "./interchaintxs/v1/tx.amino";
++import * as neutronTransferV1TxAmino from "./transfer/v1/tx.amino";
+ export const neutronAminoConverters = {
+   ...neutronCronTxAmino.AminoConverter,
+   ...neutronDexTxAmino.AminoConverter,
+   ...neutronFeeburnerTxAmino.AminoConverter,
+   ...neutronFeerefunderTxAmino.AminoConverter,
+   ...neutronInterchainqueriesTxAmino.AminoConverter,
+-  ...neutronInterchaintxsV1TxAmino.AminoConverter
++  ...neutronInterchaintxsV1TxAmino.AminoConverter,
++  ...neutronTransferV1TxAmino.AminoConverter,
+ };
+-export const neutronProtoRegistry: ReadonlyArray<[string, GeneratedType]> = [...neutronCronTxRegistry.registry, ...neutronDexTxRegistry.registry, ...neutronFeeburnerTxRegistry.registry, ...neutronFeerefunderTxRegistry.registry, ...neutronInterchainqueriesTxRegistry.registry, ...neutronInterchaintxsV1TxRegistry.registry];
++export const neutronProtoRegistry: ReadonlyArray<[string, GeneratedType]> = [...neutronCronTxRegistry.registry, ...neutronDexTxRegistry.registry, ...neutronFeeburnerTxRegistry.registry, ...neutronFeerefunderTxRegistry.registry, ...neutronInterchainqueriesTxRegistry.registry, ...neutronInterchaintxsV1TxRegistry.registry, ...neutronTransferV1TxRegistry.registry];
+ export const getSigningNeutronClientOptions = ({
+   defaultTypes = defaultRegistryTypes
+ }: {
+diff --git b/packages/utils/protobuf/codegen/regen/data/v1/tx.ts a/packages/utils/protobuf/codegen/regen/data/v1/tx.ts
+index 640c2bcef..5bd95374c 100644
+--- b/packages/utils/protobuf/codegen/regen/data/v1/tx.ts
++++ a/packages/utils/protobuf/codegen/regen/data/v1/tx.ts
+@@ -1,5 +1,5 @@
+ //@ts-nocheck
+-import { ContentHash, ContentHashAmino, ContentHashSDKType, ContentHash_Graph } from "./types";
++import { ContentHash, ContentHashAmino, ContentHashSDKType, ContentHash_Graph, ContentHash_GraphAmino, ContentHash_GraphSDKType } from "./types";
+ import { Timestamp } from "../../../google/protobuf/timestamp";
+ import { BinaryReader, BinaryWriter } from "../../../binary";
+ import { toTimestamp, fromTimestamp } from "../../../helpers";
+diff --git b/packages/utils/protobuf/codegen/regen/data/v2/tx.ts a/packages/utils/protobuf/codegen/regen/data/v2/tx.ts
+index fe58afb74..f0e94453b 100644
+--- b/packages/utils/protobuf/codegen/regen/data/v2/tx.ts
++++ a/packages/utils/protobuf/codegen/regen/data/v2/tx.ts
+@@ -1,5 +1,5 @@
+ //@ts-nocheck
+-import { ContentHash, ContentHashAmino, ContentHashSDKType, ContentHash_Graph } from "./types";
++import { ContentHash, ContentHashAmino, ContentHashSDKType, ContentHash_Graph, ContentHash_GraphAmino, ContentHash_GraphSDKType } from "./types";
+ import { Timestamp } from "../../../google/protobuf/timestamp";
+ import { BinaryReader, BinaryWriter } from "../../../binary";
+ import { toTimestamp, fromTimestamp } from "../../../helpers";

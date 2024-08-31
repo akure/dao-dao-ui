@@ -12,7 +12,6 @@ import { walletChainIdAtom } from '@dao-dao/state'
 import { Modal, WarningCard } from '@dao-dao/stateless'
 import {
   getChainForChainId,
-  getSupportedChains,
   maybeGetAssetListForChainId,
   maybeGetChainForChainId,
   processError,
@@ -129,19 +128,17 @@ export const WalletUi = (props: WalletModalProps) => {
 
             // Connect to wallet.
             try {
-              // Ensure supported chains are added before connecting.
-              const chainRecords = uniq([
-                ...getSupportedChains().map(({ chainId }) => chainId),
-                wallet.chainId,
-                mainWalletChainId,
-              ]).map((chainId) =>
-                convertChain(
-                  getChainForChainId(chainId),
-                  [maybeGetAssetListForChainId(chainId)].filter(
-                    (al): al is AssetList => !!al
+              // Ensure chains are added before connecting.
+              const chainRecords = uniq([wallet.chainId, mainWalletChainId])
+                .filter(Boolean)
+                .map((chainId) =>
+                  convertChain(
+                    getChainForChainId(chainId),
+                    [maybeGetAssetListForChainId(chainId)].filter(
+                      (al): al is AssetList => !!al
+                    )
                   )
                 )
-              )
 
               await Promise.allSettled(
                 chainRecords.map(
@@ -151,6 +148,11 @@ export const WalletUi = (props: WalletModalProps) => {
                       .catch(console.error)
                 )
               )
+
+              if (wallet.isWalletNotExist) {
+                toast.error(`${wallet.walletPrettyName} is not installed.`)
+                return
+              }
 
               await Promise.all([
                 // If main wallet repo not connected or is the same chain,

@@ -13,7 +13,6 @@ import {
   validatorSlashesSelector,
 } from '@dao-dao/state/recoil'
 import {
-  OldVestingPaymentFactory,
   TokenType,
   VestingInfo,
   VestingStep,
@@ -22,9 +21,7 @@ import {
 import {
   ContractName,
   convertMicroDenomToDenomWithDecimals,
-  getChainForChainId,
   getVestingValidatorSlashes,
-  isValidContractAddress,
 } from '@dao-dao/utils'
 
 export const vestingPaymentsOwnedBySelector = selectorFamily<
@@ -99,33 +96,25 @@ export const vestingFactoryOwnerSelector = selectorFamily<
 
 export const vestingInfosForFactorySelector = selectorFamily<
   VestingInfo[],
-  WithChainId<{ factory: string; oldFactories?: OldVestingPaymentFactory[] }>
+  WithChainId<{ factory: string }>
 >({
   key: 'vestingInfosForFactory',
   get:
-    ({ chainId, factory, oldFactories }) =>
+    ({ chainId, factory }) =>
     ({ get }) => {
       const vestingPaymentContracts = get(
-        waitForAll([
-          CwPayrollFactorySelectors.allVestingContractsSelector({
-            contractAddress: factory,
-            chainId,
-          }),
-          ...(oldFactories?.map(({ address }) =>
-            CwPayrollFactorySelectors.allVestingContractsSelector({
-              contractAddress: address,
-              chainId,
-            })
-          ) ?? []),
-        ])
-      ).flat()
+        CwPayrollFactorySelectors.allVestingContractsSelector({
+          chainId,
+          contractAddress: factory,
+        })
+      )
 
       return get(
         waitForAll(
           vestingPaymentContracts.map(({ contract }) =>
             vestingInfoSelector({
-              vestingContractAddress: contract,
               chainId,
+              vestingContractAddress: contract,
             })
           )
         )
@@ -199,17 +188,15 @@ export const vestingInfoSelector = selectorFamily<
         ])
       )
 
-      const ownerIsCw1Whitelist =
-        owner &&
-        isValidContractAddress(owner, getChainForChainId(chainId).bech32_prefix)
-          ? get(
-              isContractSelector({
-                chainId,
-                contractAddress: owner,
-                name: ContractName.Cw1Whitelist,
-              })
-            )
-          : false
+      const ownerIsCw1Whitelist = owner
+        ? get(
+            isContractSelector({
+              chainId,
+              contractAddress: owner,
+              name: ContractName.Cw1Whitelist,
+            })
+          )
+        : false
       const cw1WhitelistAdmins =
         owner && ownerIsCw1Whitelist
           ? get(
@@ -381,6 +368,7 @@ export const vestingInfoSelector = selectorFamily<
       const endDate = new Date(steps[steps.length - 1].timestamp)
 
       return {
+        chainId,
         vestingContractAddress,
         vest,
         token,

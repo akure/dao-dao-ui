@@ -11,12 +11,13 @@ import {
   getFallbackImage,
   toAccessibleImageUrl,
   tokensEqual,
+  transformIpfsUrlToHttpsIfNecessary,
   validateNonNegative,
   validatePositive,
   validateRequired,
 } from '@dao-dao/utils'
 
-import { ChainLogo } from '../ChainLogo'
+import { ChainLogo } from '../chain/ChainLogo'
 import { FilterableItemPopup } from '../popup'
 import { Tooltip } from '../tooltip'
 import { NumberInput } from './NumberInput'
@@ -200,8 +201,9 @@ export const TokenInput = <
                 : tokens.data.map((token, index) => ({
                     key: index + token.denomOrAddress,
                     label: token.symbol,
-                    iconUrl:
-                      token.imageUrl || getFallbackImage(token.denomOrAddress),
+                    iconUrl: transformIpfsUrlToHttpsIfNecessary(
+                      token.imageUrl || getFallbackImage(token.denomOrAddress)
+                    ),
                     ...token,
                     rightNode: (
                       <p className="caption-text max-w-[5rem] truncate">

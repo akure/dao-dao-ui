@@ -3,6 +3,23 @@
 import { ChainId } from '@dao-dao/types'
 
 export const SITE_IMAGE = '/social.jpg'
+export const SITE_TITLE = 'DAO DAO'
+export const DEFAULT_SITE_DESCRIPTION =
+  'Create a DAO to manage your community, protocol, or entire blockchain in just a few clicks. We support multisig, token-based, and NFT-based DAOs that can be as simple or complex as you want. Set up SubDAOs, manage interchain assets, and interact with dApps across the Cosmos.'
+export const CREATE_PAGE_TITLE = 'Create a DAO'
+export const CREATE_PAGE_DESCRIPTION =
+  'Create a new project, protocol, organization, or community—organized any way you can imagine.'
+export const ACCOUNT_PAGE_TITLE = 'Account: ADDRESS'
+export const ACCOUNT_PAGE_DESCRIPTION =
+  'View tokens and NFTs for the account with address ADDRESS.'
+export const NOTIFICATIONS_PAGE_TITLE = 'Notifications'
+export const NOTIFICATIONS_PAGE_DESCRIPTION =
+  'View notifications in your followed DAOs.'
+export const ME_PAGE_TITLE = 'Account'
+export const ME_PAGE_DESCRIPTION =
+  'View your tokens, NFTs, and DAOs, or execute transactions from your wallet.'
+export const STATUS_PAGE_TITLE = 'Status'
+export const STATUS_PAGE_DESCRIPTION = "Check the status of DAO DAO's services."
 
 // 3 days
 export const IBC_TIMEOUT_SECONDS = 3 * 24 * 60 * 60
@@ -30,6 +47,10 @@ export const FOLLOWING_DAOS_PREFIX = 'following:'
 export const DAO_CORE_PAYROLL_CONFIG_ITEM_KEY = 'payroll'
 // The key for the item in the DAO core contract that contains the accent color.
 export const DAO_CORE_ACCENT_ITEM_KEY = 'accent'
+
+// The key for the item in the DAO core contract that enables the memo field on
+// execute.
+export const DAO_CORE_ALLOW_MEMO_ON_EXECUTE_ITEM_KEY = 'allow_memo_on_execute'
 
 // Me balances page
 export const HIDDEN_BALANCE_PREFIX = 'hiddenBalance:'
@@ -66,6 +87,9 @@ export const WHITE_WHALE_PRICES_API =
 export const ASTROPORT_PRICES_API =
   'https://api.astroport.fi/api/tokens/DENOM?chainId=neutron-1'
 
+// Snapper API
+export const SNAPPER_API_BASE = 'https://snapper.daodao.zone'
+
 // KVPK prefix for saved Me page transactions.
 export const ME_SAVED_TX_PREFIX = 'savedTx:'
 
@@ -87,6 +111,12 @@ export const INACTIVE_DAO_NAMES = ['[archived]', '[deleted]']
 
 // The namespace (prefix) of enabled vetoable DAOs stored in the items list.
 export const VETOABLE_DAOS_ITEM_KEY_PREFIX = 'showVetoableDao:'
+
+/**
+ * The address passed to the historical balance and treasury value selectors to
+ * indicate that it should load tokens from the community pool instead.
+ */
+export const COMMUNITY_POOL_ADDRESS_PLACEHOLDER = 'COMMUNITY_POOL'
 
 // 1-10 linear from purple to orange/yellow. Intersperse colors so similar
 // colors are not adjacent.
@@ -141,3 +171,14 @@ export const CHAIN_SUBDAOS: Record<string, string[] | undefined> = {
     'juno1mjsgk02jyn72jm2x7fgw72uu9wj7xy0v6pnuj2jd3aq7rgeqg5qq4dnhes',
   ],
 }
+
+/**
+ * Error substrings that indicate a contract is invalid or does not exist.
+ */
+export const INVALID_CONTRACT_ERROR_SUBSTRINGS = [
+  'Error parsing into type',
+  'no such contract',
+  'not found: invalid request',
+  'unknown query path',
+  'decoding bech32 failed',
+]

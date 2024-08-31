@@ -320,6 +320,7 @@ export const ProposalList = () => {
   const loadMoreRef = useRef(loadMore)
   loadMoreRef.current = loadMore
   useEffect(() => {
+    // @ts-ignore
     loadMoreRef.current()
   }, [])
 
@@ -342,6 +343,7 @@ export const ProposalList = () => {
     () => setRefreshProposalsId((id) => id + 1)
   )
 
+  // @ts-ignore
   return (
     <StatelessProposalList
       DiscordNotifierConfigureModal={DiscordNotifierConfigureModal}

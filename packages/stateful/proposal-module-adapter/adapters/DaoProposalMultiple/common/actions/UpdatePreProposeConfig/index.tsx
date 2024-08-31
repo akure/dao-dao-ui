@@ -28,7 +28,7 @@ import {
   convertDenomToMicroDenomWithDecimals,
   convertMicroDenomToDenomWithDecimals,
   getNativeTokenForChainId,
-  isValidContractAddress,
+  isValidBech32Address,
   makeWasmMessage,
 } from '@dao-dao/utils'
 
@@ -64,7 +64,7 @@ export const Component: ActionComponent = (props) => {
   const tokenLoadable = useRecoilValueLoadable(
     depositInfo.type === 'cw20' &&
       depositInfo.denomOrAddress &&
-      isValidContractAddress(depositInfo.denomOrAddress, bech32Prefix)
+      isValidBech32Address(depositInfo.denomOrAddress, bech32Prefix)
       ? genericTokenSelector({
           chainId,
           type: TokenType.Cw20,
@@ -297,17 +297,9 @@ export const makeUpdatePreProposeConfigActionMaker =
         msg,
         DAO_PRE_PROPOSE_MULTIPLE_CONTRACT_NAMES,
         {
-          wasm: {
-            execute: {
-              contract_addr: {},
-              funds: {},
-              msg: {
-                update_config: {
-                  deposit_info: {},
-                  open_proposal_submission: {},
-                },
-              },
-            },
+          update_config: {
+            deposit_info: {},
+            open_proposal_submission: {},
           },
         }
       )

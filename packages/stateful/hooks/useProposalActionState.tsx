@@ -9,15 +9,22 @@ import { DaoProposalSingleCommonSelectors } from '@dao-dao/state'
 import {
   ProposalCrossChainRelayStatus,
   ProposalStatusAndInfoProps,
+  TextInput,
   useConfiguredChainContext,
   useDaoInfoContext,
 } from '@dao-dao/stateless'
 import {
+  ChainId,
   LoadingData,
+  PreProposeModuleType,
   ProposalStatusEnum,
   ProposalStatusKey,
 } from '@dao-dao/types'
-import { processError } from '@dao-dao/utils'
+import {
+  DAO_CORE_ALLOW_MEMO_ON_EXECUTE_ITEM_KEY,
+  NEUTRON_GOVERNANCE_DAO,
+  processError,
+} from '@dao-dao/utils'
 
 import { ProfileProposalCard } from '../components'
 import { useProposalModuleAdapterOptions } from '../proposal-module-adapter'
@@ -29,7 +36,12 @@ export type UseProposalActionStateOptions = {
   polytoneState: UseProposalPolytoneStateReturn
   statusKey: ProposalStatusKey
   loadingExecutionTxHash: LoadingData<string | undefined>
-  executeProposal: (options: { proposalId: number }) => Promise<ExecuteResult>
+  executeProposal: (
+    options: { proposalId: number },
+    // No need.
+    fee?: undefined,
+    memo?: string | undefined
+  ) => Promise<ExecuteResult>
   closeProposal: (options: { proposalId: number }) => Promise<ExecuteResult>
   onExecuteSuccess: () => void | Promise<void>
   onCloseSuccess: () => void | Promise<void>
@@ -58,7 +70,7 @@ export const useProposalActionState = ({
   const {
     chain: { chain_id: chainId },
   } = useConfiguredChainContext()
-  const { coreAddress } = useDaoInfoContext()
+  const { coreAddress, items } = useDaoInfoContext()
   const { proposalModule, proposalNumber } = useProposalModuleAdapterOptions()
   const { isWalletConnected } = useWallet()
   const { isMember = false } = useMembership({
@@ -79,6 +91,11 @@ export const useProposalActionState = ({
     setActionLoading(false)
   }, [statusKey])
 
+  // If enabled, the user will be shown an input field to enter a memo for the
+  // execution transaction.
+  const allowMemoOnExecute = !!items[DAO_CORE_ALLOW_MEMO_ON_EXECUTE_ITEM_KEY]
+  const [memo, setMemo] = useState('')
+
   const onExecute = useCallback(async () => {
     if (!isWalletConnected) {
       return
@@ -86,9 +103,13 @@ export const useProposalActionState = ({
 
     setActionLoading(true)
     try {
-      await executeProposal({
-        proposalId: proposalNumber,
-      })
+      await executeProposal(
+        {
+          proposalId: proposalNumber,
+        },
+        undefined,
+        allowMemoOnExecute && memo ? memo : undefined
+      )
 
       await onExecuteSuccess()
     } catch (err) {
@@ -100,7 +121,14 @@ export const useProposalActionState = ({
     }
 
     // Loading will stop on success when status refreshes.
-  }, [isWalletConnected, executeProposal, proposalNumber, onExecuteSuccess])
+  }, [
+    isWalletConnected,
+    executeProposal,
+    proposalNumber,
+    allowMemoOnExecute,
+    memo,
+    onExecuteSuccess,
+  ])
 
   const onClose = useCallback(async () => {
     if (!isWalletConnected) {
@@ -145,8 +173,22 @@ export const useProposalActionState = ({
             doAction: polytoneState.data.needsSelfRelay
               ? polytoneState.data.openPolytoneRelay
               : onExecute,
+            header: allowMemoOnExecute ? (
+              <TextInput
+                onChange={(e) => setMemo(e.target.value)}
+                placeholder={t('info.memoPlaceholder')}
+                value={memo}
+              />
+            ) : undefined,
           }
-        : statusKey === ProposalStatusEnum.Rejected
+        : statusKey === ProposalStatusEnum.Rejected &&
+          // Don't show for Neutron overrule proposals.
+          !(
+            chainId === ChainId.NeutronMainnet &&
+            coreAddress === NEUTRON_GOVERNANCE_DAO &&
+            proposalModule.prePropose?.type ===
+              PreProposeModuleType.NeutronOverruleSingle
+          )
         ? {
             label: t('button.close'),
             Icon: CancelOutlined,

@@ -38,6 +38,7 @@ import {
   ContractName,
   DAO_CORE_ACCENT_ITEM_KEY,
   DAO_STATIC_PROPS_CACHE_SECONDS,
+  INVALID_CONTRACT_ERROR_SUBSTRINGS,
   LEGACY_DAO_CONTRACT_NAMES,
   LEGACY_URL_PREFIX,
   MAX_META_CHARS_PROPOSAL_DESCRIPTION,
@@ -52,10 +53,11 @@ import {
   getSupportedChainConfig,
   getSupportedFeatures,
   isFeatureSupportedByVersion,
-  isValidContractAddress,
+  isValidBech32Address,
   parseContractVersion,
   polytoneNoteProxyMapToChainIdMap,
   processError,
+  retry,
 } from '@dao-dao/utils'
 import { cosmos } from '@dao-dao/utils/protobuf'
 
@@ -499,11 +501,15 @@ const loadParentDaoInfo = async (
 
   try {
     // Check if address is chain module account.
-    const cosmosClient = (
-      await cosmos.ClientFactory.createRPCQueryClient({
-        rpcEndpoint: getRpcForChainId(chainId),
-      })
-    ).cosmos
+    const cosmosClient = await retry(
+      10,
+      async (attempt) =>
+        (
+          await cosmos.ClientFactory.createRPCQueryClient({
+            rpcEndpoint: getRpcForChainId(chainId, attempt - 1),
+          })
+        ).cosmos
+    )
     // If chain module gov account...
     if (await addressIsModule(cosmosClient, potentialParentAddress, 'gov')) {
       const chainConfig = getSupportedChainConfig(chainId)
@@ -521,7 +527,7 @@ const loadParentDaoInfo = async (
     }
 
     if (
-      !isValidContractAddress(
+      !isValidBech32Address(
         potentialParentAddress,
         getChainForChainId(chainId).bech32_prefix
       )
@@ -550,7 +556,12 @@ const loadParentDaoInfo = async (
     }
   } catch (err) {
     // If contract not found, ignore error. Otherwise, log it.
-    if (!(err instanceof Error) || !err.message.includes('not found')) {
+    if (
+      !(err instanceof Error) ||
+      !INVALID_CONTRACT_ERROR_SUBSTRINGS.some((substring) =>
+        (err as Error).message.includes(substring)
+      )
+    ) {
       console.error(err)
       console.error(
         `Error loading parent DAO (${potentialParentAddress}) of ${subDaoAddress}`,
@@ -589,7 +600,11 @@ const daoCoreDumpState = async (
   // Prevent cycles by ensuring admin has not already been seen.
   previousParentAddresses?: string[]
 ): Promise<DaoCoreDumpState> => {
-  const cwClient = await cosmWasmClientRouter.connect(getRpcForChainId(chainId))
+  const cwClient = await retry(
+    10,
+    async (attempt) =>
+      await cosmWasmClientRouter.connect(getRpcForChainId(chainId, attempt - 1))
+  )
 
   try {
     const indexerDumpedState = await queryIndexer<IndexerDumpState>({

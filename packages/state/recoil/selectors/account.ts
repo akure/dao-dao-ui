@@ -1,3 +1,4 @@
+import { toHex } from '@cosmjs/encoding'
 import {
   constSelector,
   selectorFamily,
@@ -8,6 +9,7 @@ import {
 import {
   Account,
   AccountType,
+  CryptographicMultisigDetails,
   GenericToken,
   GenericTokenBalanceWithOwner,
   IcaAccount,
@@ -17,9 +19,15 @@ import {
 import {
   ICA_CHAINS_TX_PREFIX,
   POLYTONE_CONFIG_PER_CHAIN,
+  getChainForChainId,
+  secp256k1PublicKeyToBech32Address,
   tokensEqual,
 } from '@dao-dao/utils'
+import { BaseAccount } from '@dao-dao/utils/protobuf/codegen/cosmos/auth/v1beta1/auth'
+import { LegacyAminoPubKey } from '@dao-dao/utils/protobuf/codegen/cosmos/crypto/multisig/keys'
+import { PubKey } from '@dao-dao/utils/protobuf/codegen/cosmos/crypto/secp256k1/keys'
 
+import { cosmosRpcClientForChainSelector } from './chain'
 import { isDaoSelector, isPolytoneProxySelector } from './contract'
 import { DaoCoreV2Selectors, PolytoneProxySelectors } from './contracts'
 import { icaRemoteAddressSelector } from './ica'
@@ -27,6 +35,7 @@ import {
   genericTokenBalanceSelector,
   genericTokenBalancesSelector,
   genericTokenDelegatedBalanceSelector,
+  genericTokenUndelegatingBalancesSelector,
 } from './token'
 
 // Get accounts controlled by this address, including its native chain, all
@@ -150,7 +159,7 @@ export const allBalancesSelector = selectorFamily<
       GenericToken,
       'chainId' | 'type' | 'denomOrAddress'
     >[]
-    // Ignore staked tokens.
+    // Ignore staked and unstaking tokens.
     ignoreStaked?: boolean
   }>
 >({
@@ -214,7 +223,14 @@ export const allBalancesSelector = selectorFamily<
               (!filter || filter === TokenType.Native) && !ignoreStaked
                 ? genericTokenDelegatedBalanceSelector({
                     chainId,
-                    walletAddress: address,
+                    address,
+                  })
+                : constSelector(undefined),
+              // Native unstaking
+              (!filter || filter === TokenType.Native) && !ignoreStaked
+                ? genericTokenUndelegatingBalancesSelector({
+                    chainId,
+                    address,
                   })
                 : constSelector(undefined),
             ])
@@ -238,18 +254,14 @@ export const allBalancesSelector = selectorFamily<
 
         // Native staked
         const stakedBalance = accountBalances[index][2].valueMaybe()
+        // Native unstaking
+        const unstakingBalances = accountBalances[index][3].valueMaybe()
 
         const balances = [
           ...unstakedBalances,
           ...additionalUnstakedBalances,
-          ...(stakedBalance
-            ? [
-                {
-                  ...stakedBalance,
-                  staked: true,
-                },
-              ]
-            : []),
+          ...(stakedBalance ? [stakedBalance] : []),
+          ...(unstakingBalances ?? []),
         ]
 
         return balances.map(
@@ -317,6 +329,58 @@ export const reverseLookupPolytoneProxySelector = selectorFamily<
         chainId: srcPolytoneInfo[0],
         address,
         note: srcPolytoneInfo[1][chainId].note,
+      }
+    },
+})
+
+/**
+ * Get the details of a cryptographic multisig account.
+ */
+export const cryptographicMultisigDetailsSelector = selectorFamily<
+  CryptographicMultisigDetails,
+  WithChainId<{ address: string }>
+>({
+  key: 'cryptographicMultisigDetails',
+  get:
+    ({ address, chainId }) =>
+    async ({ get }) => {
+      const { bech32_prefix: bech32Prefix } = getChainForChainId(chainId)
+      const client = get(cosmosRpcClientForChainSelector(chainId))
+
+      const { account } = await client.auth.v1beta1.account({
+        address,
+      })
+
+      if (
+        !account ||
+        account.$typeUrl !== BaseAccount.typeUrl ||
+        account.pubKey?.typeUrl !== LegacyAminoPubKey.typeUrl
+      ) {
+        throw new Error('Not a multisig address.')
+      }
+
+      const { publicKeys, threshold } = LegacyAminoPubKey.decode(
+        account.pubKey.value
+      )
+
+      if (publicKeys.some(({ typeUrl }) => typeUrl !== PubKey.typeUrl)) {
+        throw new Error('Unsupported multisig.')
+      }
+
+      const addresses = await Promise.all(
+        publicKeys.map((key) =>
+          secp256k1PublicKeyToBech32Address(
+            toHex(PubKey.decode(key.value).key),
+            bech32Prefix
+          )
+        )
+      )
+
+      return {
+        chainId,
+        address,
+        addresses,
+        threshold,
       }
     },
 })

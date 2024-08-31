@@ -19,9 +19,11 @@ import {
 } from '@dao-dao/stateless'
 import { Theme } from '@dao-dao/types'
 import {
+  ACCOUNT_PAGE_DESCRIPTION,
+  ACCOUNT_PAGE_TITLE,
   SITE_URL,
   getConfiguredChains,
-  isValidWalletAddress,
+  isValidBech32Address,
   transformBech32Address,
 } from '@dao-dao/utils'
 
@@ -39,7 +41,7 @@ export const Account: NextPage = () => {
 
   const validAddress =
     typeof address === 'string' && address
-      ? isValidWalletAddress(address)
+      ? isValidBech32Address(address)
       : false
 
   if (!validAddress) {
@@ -111,20 +113,22 @@ export const Account: NextPage = () => {
     averageImgColorLoadable.contents,
   ])
 
+  const pageTitle = ACCOUNT_PAGE_TITLE.replace('ADDRESS', accountAddress)
+  const pageDescription = ACCOUNT_PAGE_DESCRIPTION.replace(
+    'ADDRESS',
+    accountAddress
+  )
+
   return (
     <>
       <NextSeo
-        description={t('info.accountPageDescription', {
-          address: accountAddress,
-        })}
+        description={pageDescription}
         openGraph={{
           url: SITE_URL + router.asPath,
-          title: t('title.account') + ': ' + accountAddress,
-          description: t('info.accountPageDescription', {
-            address: accountAddress,
-          }),
+          title: pageTitle,
+          description: pageDescription,
         }}
-        title={t('title.account') + ': ' + accountAddress}
+        title={pageTitle}
       />
 
       <PageHeaderContent title={t('title.account')} />

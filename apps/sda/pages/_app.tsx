@@ -11,7 +11,6 @@ import { DefaultSeo } from 'next-seo'
 import type { AppProps } from 'next/app'
 import { useRouter } from 'next/router'
 import { Fragment, useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import { RecoilRoot, useRecoilState, useSetRecoilState } from 'recoil'
 
 import {
@@ -33,7 +32,12 @@ import {
   ToastNotifications,
 } from '@dao-dao/stateless'
 import { DaoPageMode } from '@dao-dao/types'
-import { SITE_IMAGE, SITE_URL } from '@dao-dao/utils'
+import {
+  DEFAULT_SITE_DESCRIPTION,
+  SITE_IMAGE,
+  SITE_TITLE,
+  SITE_URL,
+} from '@dao-dao/utils'
 
 const InnerApp = ({
   Component,
@@ -127,8 +131,6 @@ const InnerApp = ({
 }
 
 const Sda = (props: AppProps<DaoPageWrapperProps>) => {
-  const { t } = useTranslation()
-
   const [icon, setIcon] = useState<string>()
 
   return (
@@ -165,23 +167,15 @@ const Sda = (props: AppProps<DaoPageWrapperProps>) => {
             content: '#111213',
           },
         ]}
-        description={t('meta.description').replace(
-          // eslint-disable-next-line i18next/no-literal-string
-          'meta.description',
-          'Loading...'
-        )}
+        description={DEFAULT_SITE_DESCRIPTION}
         openGraph={{
           url: SITE_URL,
           type: 'website',
-          title: t('meta.title').replace('meta.title', 'Loading...'),
-          description: t('meta.description').replace(
-            'meta.description',
-            'Loading...'
-          ),
+          title: SITE_TITLE,
+          description: DEFAULT_SITE_DESCRIPTION,
           images: SITE_IMAGE ? [{ url: SITE_IMAGE }] : [],
         }}
-        // eslint-disable-next-line i18next/no-literal-string
-        title={t('meta.title').replace('meta.title', 'Loading...')}
+        title={SITE_TITLE}
         twitter={{
           cardType: 'summary_large_image',
         }}

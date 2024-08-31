@@ -3,6 +3,7 @@ import { fromBase64, toHex } from '@cosmjs/encoding'
 import { Coin, IndexedTx, StargateClient } from '@cosmjs/stargate'
 import uniq from 'lodash.uniq'
 import {
+  noWait,
   selector,
   selectorFamily,
   waitForAll,
@@ -52,6 +53,7 @@ import {
 } from '@dao-dao/utils/protobuf'
 import { ModuleAccount } from '@dao-dao/utils/protobuf/codegen/cosmos/auth/v1beta1/auth'
 import { Metadata } from '@dao-dao/utils/protobuf/codegen/cosmos/bank/v1beta1/bank'
+import { DecCoin } from '@dao-dao/utils/protobuf/codegen/cosmos/base/v1beta1/coin'
 import {
   ProposalStatus,
   TallyResult,
@@ -77,6 +79,7 @@ import {
   queryValidatorIndexerSelector,
 } from './indexer'
 import { genericTokenSelector } from './token'
+import { walletTokenDaoStakedDenomsSelector } from './wallet'
 
 export const stargateClientForChainSelector = selectorFamily<
   StargateClient,
@@ -341,14 +344,35 @@ export const nativeBalancesSelector = selectorFamily<
       const balances = [
         ...get(justNativeBalancesSelector({ address, chainId })),
       ]
-      // Add native denom if not present.
       const nativeToken = getNativeTokenForChainId(chainId)
-      if (!balances.some(({ denom }) => denom === nativeToken.denomOrAddress)) {
+      const stakedDenoms =
+        get(
+          noWait(
+            walletTokenDaoStakedDenomsSelector({
+              walletAddress: address,
+              chainId,
+            })
+          )
+        ).valueMaybe() || []
+
+      const uniqueDenoms = new Set(balances.map(({ denom }) => denom))
+
+      // Add native denom if not present.
+      if (!uniqueDenoms.has(nativeToken.denomOrAddress)) {
         balances.push({
           amount: '0',
           denom: nativeToken.denomOrAddress,
         })
+        uniqueDenoms.add(nativeToken.denomOrAddress)
       }
+
+      // Add denoms staked to DAOs if not present.
+      stakedDenoms.forEach((denom) => {
+        if (!uniqueDenoms.has(denom)) {
+          balances.push({ amount: '0', denom })
+          uniqueDenoms.add(denom)
+        }
+      })
 
       const tokenLoadables = get(
         waitForAny(
@@ -697,6 +721,8 @@ export const govProposalsSelector = selectorFamily<
     async ({ get }) => {
       get(refreshGovProposalsAtom(chainId))
 
+      const supportsV1Gov = get(chainSupportsV1GovModuleSelector({ chainId }))
+
       let v1Proposals: ProposalV1[] | undefined
       let v1Beta1Proposals: ProposalV1Beta1[] | undefined
       let total = 0
@@ -704,7 +730,6 @@ export const govProposalsSelector = selectorFamily<
       // Try to load from indexer first.
       const indexerProposals: {
         id: string
-        version: string
         data: string
       }[] =
         get(
@@ -716,32 +741,34 @@ export const govProposalsSelector = selectorFamily<
               offset,
             },
           })
-        ) ?? []
+        )?.proposals ?? []
 
       if (indexerProposals.length) {
-        v1Proposals = indexerProposals
-          .filter(({ version }) => version === GovProposalVersion.V1)
-          .flatMap(({ data }): ProposalV1 | [] => {
-            try {
-              return ProposalV1.decode(fromBase64(data))
-            } catch {
-              return []
+        if (supportsV1Gov) {
+          v1Proposals = indexerProposals.flatMap(
+            ({ data }): ProposalV1 | [] => {
+              try {
+                return ProposalV1.decode(fromBase64(data))
+              } catch {
+                return []
+              }
             }
-          })
-        v1Beta1Proposals = indexerProposals
-          .filter(({ version }) => version === GovProposalVersion.V1_BETA_1)
-          .flatMap(({ data }): ProposalV1Beta1 | [] => {
-            try {
-              return ProposalV1Beta1.decode(fromBase64(data))
-            } catch {
-              return []
+          )
+        } else {
+          v1Beta1Proposals = indexerProposals.flatMap(
+            ({ data }): ProposalV1Beta1 | [] => {
+              try {
+                return ProposalV1Beta1.decode(fromBase64(data))
+              } catch {
+                return []
+              }
             }
-          })
+          )
+        }
 
         // Fallback to querying chain if indexer failed.
       } else {
         const client = get(cosmosRpcClientForChainSelector(chainId))
-        const supportsV1Gov = get(chainSupportsV1GovModuleSelector({ chainId }))
         if (supportsV1Gov) {
           try {
             if (limit === undefined && offset === undefined) {
@@ -853,6 +880,8 @@ export const govProposalSelector = selectorFamily<
     async ({ get }) => {
       get(refreshGovProposalsAtom(chainId))
 
+      const supportsV1Gov = get(chainSupportsV1GovModuleSelector({ chainId }))
+
       // Try to load from indexer first.
       const indexerProposal:
         | {
@@ -871,7 +900,7 @@ export const govProposalSelector = selectorFamily<
       )
 
       if (indexerProposal) {
-        if (indexerProposal.version === GovProposalVersion.V1) {
+        if (supportsV1Gov) {
           return await decodeGovProposal({
             version: GovProposalVersion.V1,
             id: BigInt(proposalId),
@@ -888,7 +917,6 @@ export const govProposalSelector = selectorFamily<
 
       // Fallback to querying chain if indexer failed.
       const client = get(cosmosRpcClientForChainSelector(chainId))
-      const supportsV1Gov = get(chainSupportsV1GovModuleSelector({ chainId }))
 
       if (supportsV1Gov) {
         try {
@@ -1236,9 +1264,28 @@ export const communityPoolBalancesSelector = selectorFamily<
   get:
     ({ chainId }) =>
     async ({ get }) => {
-      const client = get(cosmosRpcClientForChainSelector(chainId))
+      let pool: DecCoin[]
 
-      const { pool } = await client.distribution.v1beta1.communityPool()
+      const poolMap: Record<string, string> | undefined = get(
+        queryGenericIndexerSelector({
+          chainId,
+          formula: 'communityPool/balances',
+        })
+      )
+      if (poolMap) {
+        pool = Object.entries(poolMap).map(
+          ([denom, amount]): DecCoin => ({
+            denom,
+            amount,
+          })
+        )
+
+        // Fallback to querying chain if indexer failed.
+      } else {
+        const client = get(cosmosRpcClientForChainSelector(chainId))
+        pool = (await client.distribution.v1beta1.communityPool()).pool
+      }
+
       const tokens = get(
         waitForAll(
           pool.map(({ denom }) =>

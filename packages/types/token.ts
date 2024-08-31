@@ -49,6 +49,8 @@ export type GenericTokenBalance = {
   isGovernanceToken?: boolean
   // Whether or not this is staked.
   staked?: boolean
+  // Whether or not this is unstaking.
+  unstaking?: boolean
 }
 
 export type GenericTokenBalanceWithOwner = GenericTokenBalance & {
@@ -138,10 +140,6 @@ export type TokenCardProps = TokenCardInfo & {
     // Extra sections to add to the action popup.
     extraSections?: ButtonPopupSection[]
   }
-  /**
-   * Whether or not to hide the DAOs governed section.
-   */
-  hideDaosGoverned?: boolean
 }
 
 export type TokenLineProps<T extends TokenCardInfo = TokenCardInfo> = T & {
@@ -184,4 +182,11 @@ export type TokenInfoResponseWithAddressAndLogo = TokenInfoResponse & {
 export type AmountWithTimestamp = {
   amount: number
   timestamp: Date
+}
+
+export enum TokenPriceHistoryRange {
+  Year = 'year',
+  Month = 'month',
+  Week = 'week',
+  Day = 'day',
 }

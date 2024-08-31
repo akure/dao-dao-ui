@@ -1,46 +1,46 @@
-import * as _101 from "./feeshare/v1/feeshare";
-import * as _102 from "./feeshare/v1/genesis";
-import * as _103 from "./feeshare/v1/query";
-import * as _104 from "./feeshare/v1/tx";
-import * as _105 from "./mint/genesis";
-import * as _106 from "./mint/mint";
-import * as _107 from "./mint/query";
-import * as _108 from "./mint/tx";
-import * as _345 from "./feeshare/v1/tx.amino";
-import * as _346 from "./mint/tx.amino";
-import * as _347 from "./feeshare/v1/tx.registry";
-import * as _348 from "./mint/tx.registry";
-import * as _349 from "./feeshare/v1/query.rpc.Query";
-import * as _350 from "./mint/query.rpc.Query";
-import * as _351 from "./feeshare/v1/tx.rpc.msg";
-import * as _352 from "./mint/tx.rpc.msg";
-import * as _469 from "./rpc.query";
-import * as _470 from "./rpc.tx";
+import * as _128 from "./feeshare/v1/feeshare";
+import * as _129 from "./feeshare/v1/genesis";
+import * as _130 from "./feeshare/v1/query";
+import * as _131 from "./feeshare/v1/tx";
+import * as _132 from "./mint/genesis";
+import * as _133 from "./mint/mint";
+import * as _134 from "./mint/query";
+import * as _135 from "./mint/tx";
+import * as _380 from "./feeshare/v1/tx.amino";
+import * as _381 from "./mint/tx.amino";
+import * as _382 from "./feeshare/v1/tx.registry";
+import * as _383 from "./mint/tx.registry";
+import * as _384 from "./feeshare/v1/query.rpc.Query";
+import * as _385 from "./mint/query.rpc.Query";
+import * as _386 from "./feeshare/v1/tx.rpc.msg";
+import * as _387 from "./mint/tx.rpc.msg";
+import * as _508 from "./rpc.query";
+import * as _509 from "./rpc.tx";
 export namespace juno {
   export namespace feeshare {
     export const v1 = {
-      ..._101,
-      ..._102,
-      ..._103,
-      ..._104,
-      ..._345,
-      ..._347,
-      ..._349,
-      ..._351
+      ..._128,
+      ..._129,
+      ..._130,
+      ..._131,
+      ..._380,
+      ..._382,
+      ..._384,
+      ..._386
     };
   }
   export const mint = {
-    ..._105,
-    ..._106,
-    ..._107,
-    ..._108,
-    ..._346,
-    ..._348,
-    ..._350,
-    ..._352
+    ..._132,
+    ..._133,
+    ..._134,
+    ..._135,
+    ..._381,
+    ..._383,
+    ..._385,
+    ..._387
   };
   export const ClientFactory = {
-    ..._469,
-    ..._470
+    ..._508,
+    ..._509
   };
 }

@@ -17,6 +17,7 @@ import { SupportedChainConfig, WithChainId } from './chain'
 import {
   DaoCardProps,
   DaoDropdownInfo,
+  StatefulImportMultisigModalProps,
   SuspenseLoaderProps,
 } from './components'
 import {
@@ -37,13 +38,12 @@ import { Config as NeutronCwdSubdaoTimelockSingleConfig } from './contracts/Neut
 import { VotingVault } from './contracts/NeutronVotingRegistry'
 import { DaoCreator } from './creators'
 import { ContractVersion, SupportedFeatureMap } from './features'
-import { LoadingDataWithError } from './misc'
 import { ProposalVetoConfig } from './proposal'
 import {
   PercentOrMajorityValue,
   ProposalModuleAdapter,
 } from './proposal-module-adapter'
-import { GenericToken, TokenCardInfo } from './token'
+import { GenericToken } from './token'
 import { DurationWithUnits } from './units'
 
 // Used in DaoInfoContext in @dao-dao/stateful/components/DaoPageWrapper
@@ -216,7 +216,9 @@ export interface CreateDaoContext<CreatorData extends FieldValues = any> {
   creator: DaoCreator
   proposalModuleDaoCreationAdapters: Required<ProposalModuleAdapter>['daoCreation'][]
   setCustomValidator: (fn: CreateDaoCustomValidator) => void
+  makeDefaultNewDao: (chainId: string) => NewDao
   SuspenseLoader: ComponentType<SuspenseLoaderProps>
+  ImportMultisigModal: ComponentType<StatefulImportMultisigModalProps>
 }
 
 export interface NewDao<
@@ -306,7 +308,7 @@ export interface DaoCreationVotingConfigItem<
   Icon: ComponentType
   nameI18nKey: string
   descriptionI18nKey: string
-  tooltipI18nKey?: string
+  tooltipI18nKey?: string | ((data: ModuleData) => string)
   Input: ComponentType<DaoCreationVotingConfigItemInputProps<ModuleData>>
   getInputError: (errors?: FieldErrors<ModuleData>) => FieldError | undefined
   Review: ComponentType<DaoCreationVotingConfigItemReviewProps<ModuleData>>
@@ -454,15 +456,6 @@ export enum DaoPageMode {
 export type DaoWebSocketChannelInfo = {
   chainId: string
   coreAddress: string
-}
-
-export type DaoAccountTreasuryInfo<
-  T extends TokenCardInfo,
-  N extends object
-> = {
-  account: Account
-  tokens: LoadingDataWithError<T[]>
-  nfts: LoadingDataWithError<(N & { key: string })[]>
 }
 
 export type DaoApp = {

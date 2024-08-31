@@ -24,6 +24,10 @@ import {
 import { isValidUrl } from '../isValidUrl'
 import { objectMatchesStructure } from '../objectMatchesStructure'
 import {
+  allianceAminoConverters,
+  allianceProtoRegistry,
+  circleAminoConverters,
+  circleProtoRegistry,
   cosmosAminoConverters,
   cosmosProtoRegistry,
   cosmwasmAminoConverters,
@@ -44,6 +48,11 @@ import {
   publicawesomeAminoConverters as stargazeAminoConverters,
   publicawesomeProtoRegistry as stargazeProtoRegistry,
 } from '../protobuf'
+import {
+  MsgCreateAllianceProposal,
+  MsgDeleteAllianceProposal,
+  MsgUpdateAllianceProposal,
+} from '../protobuf/codegen/alliance/alliance/gov'
 import { MsgSend } from '../protobuf/codegen/cosmos/bank/v1beta1/tx'
 import {
   MsgSetWithdrawAddress,
@@ -67,6 +76,7 @@ import {
   MsgUpdateAdmin,
 } from '../protobuf/codegen/cosmwasm/wasm/v1/tx'
 import { Any } from '../protobuf/codegen/google/protobuf/any'
+import { UploadCosmWasmPoolCodeAndWhiteListProposal } from '../protobuf/codegen/osmosis/cosmwasmpool/v1beta1/gov'
 import { isCosmWasmStargateMsg } from './cw'
 
 // Convert CosmWasm message to its encoded protobuf equivalent.
@@ -548,12 +558,28 @@ export const PROTOBUF_TYPES: ReadonlyArray<[string, GeneratedType]> = [
   ...gaiaProtoRegistry,
   ...neutronProtoRegistry,
   ...regenProtoRegistry,
+  ...allianceProtoRegistry,
+  ...circleProtoRegistry,
   // Not a query or TX so it isn't included in any of the registries. But we
   // want to decode this because it appears in gov props. We need to find a
   // better way to collect all generated types in a single registry...
+  [ParameterChangeProposal.typeUrl, ParameterChangeProposal as GeneratedType],
   [
-    '/cosmos.params.v1beta1.ParameterChangeProposal',
-    ParameterChangeProposal as GeneratedType,
+    UploadCosmWasmPoolCodeAndWhiteListProposal.typeUrl,
+    UploadCosmWasmPoolCodeAndWhiteListProposal as GeneratedType,
+  ],
+  // alliance.alliance
+  [
+    MsgCreateAllianceProposal.typeUrl,
+    MsgCreateAllianceProposal as GeneratedType,
+  ],
+  [
+    MsgUpdateAllianceProposal.typeUrl,
+    MsgUpdateAllianceProposal as GeneratedType,
+  ],
+  [
+    MsgDeleteAllianceProposal.typeUrl,
+    MsgDeleteAllianceProposal as GeneratedType,
   ],
 ]
 export const typesRegistry = new Registry(PROTOBUF_TYPES)
@@ -568,6 +594,8 @@ export const aminoTypes = new AminoTypes({
   ...gaiaAminoConverters,
   ...neutronAminoConverters,
   ...regenAminoConverters,
+  ...allianceAminoConverters,
+  ...circleAminoConverters,
 })
 
 // Encodes a protobuf message value from its JSON representation into a byte
@@ -728,25 +756,32 @@ export const decodeGovProposal = async (
     govProposal.proposal.summary ||
     legacyContent.find((content) => content?.description)?.description ||
     ''
-  // If metadata is a URL, try to fetch metadata.
-  if (
-    govProposal.proposal.metadata &&
-    isValidUrl(govProposal.proposal.metadata, true)
-  ) {
-    try {
-      const res = await fetch(
-        transformIpfsUrlToHttpsIfNecessary(govProposal.proposal.metadata)
-      )
-      const json = await res.json()
-      if (objectMatchesStructure(json, { title: {} })) {
-        title = json.title
-      }
-      if (objectMatchesStructure(json, { details: {} })) {
-        description = json.details
-      } else if (objectMatchesStructure(json, { description: {} })) {
-        description = json.description
-      }
-    } catch {}
+  if (govProposal.proposal.metadata) {
+    let metadata
+    // If metadata is a URL, try to fetch metadata.
+    if (isValidUrl(govProposal.proposal.metadata, true)) {
+      try {
+        const res = await fetch(
+          transformIpfsUrlToHttpsIfNecessary(govProposal.proposal.metadata)
+        )
+        metadata = await res.json()
+      } catch {}
+
+      // If metadata is a JSON object, use it.
+    } else {
+      try {
+        metadata = JSON.parse(govProposal.proposal.metadata)
+      } catch {}
+    }
+
+    if (objectMatchesStructure(metadata, { title: {} })) {
+      title = metadata.title
+    }
+    if (objectMatchesStructure(metadata, { details: {} })) {
+      description = metadata.details
+    } else if (objectMatchesStructure(metadata, { description: {} })) {
+      description = metadata.description
+    }
   }
 
   return {
