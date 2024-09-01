@@ -774,6 +774,10 @@ export const CHAIN_ENDPOINTS: Partial<
     rpc: 'https://quasar-rpc.polkachu.com',
     rest: 'https://quasar-api.polkachu.com',
   },
+   [ChainId.QuasarTestnet]: {
+    rpc: 'https://quasar-testnet-rpc.polkachu.com',
+    rest: 'https://quasar-testnet-api.polkachu.com',
+  },
 }
 
 // All configured chains. Configured chains are either supported chains, which
